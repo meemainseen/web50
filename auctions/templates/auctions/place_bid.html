@@ -1,0 +1,72 @@
+{% extends 'auctions/layout.html' %}
+{% block title %}Place Bid{% endblock %}
+{% block content %}
+<h1>Place Bid on {{ listing.title }}</h1>
+<small>by {{ listing.seller.first_name }} {{ listing.seller.last_name }} - Time Posted: {{ listing.time_posted }} posted under <a href="{% url 'category' listing.category|slugify %}">{{ listing.category }}</a></small> 
+{% if user.is_authenticated and user.id == listing.seller.id %}
+    | <a href="{% url 'edit_listing' listing.pk %}">(Edit)</a> 
+     <a href="{% url 'delete_listing' listing.pk %}"><span style="color:red">(Delete)</span></a></small>
+{% endif %}
+{% if message %}
+<br/>
+    <div class="alert alert-danger" role="alert">{{ message }}</div>
+{% endif %}
+<hr>
+<div class="d-flex flex-row bd-highlight mb-3 justify-content-center">
+     <div class="p-2 bd-highlight">
+          <div class="d-flex flex-column bd-highlight mb-2">
+               <div class="p-2 bd-highlight">
+                    {% if listing.image %}
+                         <img src = "{{ listing.image.url }}" width = "300">
+                    {% endif %}
+               </div>
+               <div class="p-2 bd-highlight">
+                    <p>{{ listing.description | safe }}</p>
+               </div>
+          </div>
+     </div>
+     <div class="p-2 bd-highlight">
+
+          <div class="d-flex flex-column bd-highlight mb-2">
+               <div class="p-2 bd-highlight">
+                    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+                         {% if current_bid == list_price %}
+                              <div class="card-header text-center">List Price</div>
+                              <div class="card-body">
+                              <h5 class="card-title text-center display-6"><strong>$ {{ list_price }}</strong></h5>
+                              </div>
+                         {% else %}
+                              <div class="card-header text-center">Current Bid</div>
+                              <div class="card-body">
+                              <h5 class="card-title text-center display-6"><strong>$ {{ current_bid }}</strong></h5>
+                              </div>
+                         {% endif %}
+                    </div>
+               </div>
+               <div class="p-2 bd-highlight">
+                    <div class="card text-dark bg-light mb-3" style="max-width: 36rem;">
+                         <div class="card-header text-center">Active till</div>
+                         <div class="card-body">
+                         <h5 class="card-title text-center">{{ listing.end_time }}</h5>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+     <div class="p-2 bd-highlight">
+          {% if user.is_authenticated %}
+               <div class="form-group">
+                    <form action="{% url 'place_bid' listing.pk %}" method="POST">
+                         {% csrf_token %}
+                         {{ form.as_p }}
+                         <button class="btn btn-primary btn-sm">Place Bid</button>
+                         or <a class="btn btn-secondary btn-sm" href="{% url 'view_listing' listing.pk %}">Go Back</a>
+                    </form>
+               </div> 
+          {% else %}
+               <a class="btn btn-secondary" href="{% url 'login' %}">Login</a> for more features like Add to Watchlist or Place Bid
+          {% endif %}
+     </div>
+</div>
+
+{% endblock %}
