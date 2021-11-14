@@ -1,0 +1,48 @@
+{% extends 'auctions/layout.html' %}
+{% block title %}{{ cats }}{% endblock %}
+{% block content %}
+    {% if category_listings %}
+    <h1>{{ cats }}</h1>
+        <ul>
+            {% for listing in category_listings %}
+                {% if listing.is_active %}
+                    <li>
+                        <a href="{% url 'view_listing' listing.pk %}">{{ listing.title }}</a> <small>listed under <a href="{% url 'category' listing.category|slugify %}">{{ listing.category }}</a>
+                        by {{ listing.seller.first_name }} {{ listing.seller.last_name }} <br/> - Posted at {{ listing.time_posted }}</small><br/>
+                        
+                        {% if user.is_authenticated and user.id == listing.seller.id %}
+                            - <a href="{% url 'edit_listing' listing.pk %}"><small>Edit</small></a> | 
+                            <a href="{% url 'delete_listing' listing.pk %}"><small><span style="color:red">Delete</span></small></a><br/>
+                        {% endif %}
+
+                        {% if listing.image %}
+                            <img src = "{{ listing.image.url }}" width = "350">
+                        {% endif %}
+
+                        <span class="badge rounded-pill bg-success">Listing Active</span>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'auction_summary' listing.pk %}">{{ listing.title }}</a> <small>listed under <a href="{% url 'category' listing.category|slugify %}">{{ listing.category }}</a>
+                        by {{ listing.seller.first_name }} {{ listing.seller.last_name }} <br/> - Posted at {{ listing.time_posted }}</small><br/>
+                        
+                        {% if user.is_authenticated and user.id == listing.seller.id %}
+                            - <a href="{% url 'edit_listing' listing.pk %}"><small>Edit</small></a> | 
+                            <a href="{% url 'delete_listing' listing.pk %}"><small><span style="color:red">Delete</span></small></a><br/>
+                        {% endif %}
+                        {% if listing.image %}
+                            <img src = "{{ listing.image.url }}" width = "350">
+                        {% endif %}
+                        <span class="badge rounded-pill bg-secondary">Bidding Closed</span>
+                    </li>
+                {% endif %}
+            {% endfor %}    
+        </ul>
+        <br/>
+        Go back to <a class="btn btn-dark" href="{% url 'index' %}">Home</a>
+    {% else %}
+            Sorry this page does not exist<br/><br/>
+            Go back to <a class="btn btn-dark" href="{% url 'index' %}">Home</a>
+    {% endif %}
+{% endblock %}                    <a href="{% url 'view_listing' listing.pk %}">{{ listing.title }}</a>
+                    - {{ listing.seller.first_name }} {{ listing.seller.last_name }} - {{ listing.time_posted }}

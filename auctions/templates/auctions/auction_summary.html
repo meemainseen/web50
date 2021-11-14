@@ -1,0 +1,120 @@
+{% extends 'auctions/layout.html' %}
+{% block title %}{{listing.title}} summary{% endblock %}
+{% block content %}
+
+<h1>Auction Summary : {{ listing.title }}</h1>
+<small>by {{ listing.seller.first_name }} {{ listing.seller.last_name }} - Time Posted: {{ listing.time_posted }} posted under <a href="{% url 'category' listing.category|slugify %}">{{ listing.category }}</a></small> 
+{% if user.is_authenticated and user.id == listing.seller.id %}
+    | <a href="{% url 'edit_listing' listing.pk %}">(Edit)</a> 
+     <a href="{% url 'delete_listing' listing.pk %}"><span style="color:red">(Delete)</span></a></small>
+{% endif %}
+<hr>
+<div class="d-flex flex-row bd-highlight mb-3 justify-content-center">
+     <div class="p-2 bd-highlight">
+          <div class="d-flex flex-column bd-highlight mb-2">
+               <div class="p-2 bd-highlight">
+                    {% if listing.image %}
+                         <img src = "{{ listing.image.url }}" width = "350">
+                    {% endif %}
+               </div>
+               <div class="p-2 bd-highlight">
+                    <p>{{ listing.description | safe }}</p>
+               </div>
+          </div>
+     </div>
+     {% if user.is_authenticated %}
+          {% if user.id == listing.seller.id or user.id == winning_bid.bidder.id %}
+               <div class="p-2 bd-highlight">
+
+                    <div class="d-flex flex-column bd-highlight mb-2">
+                         <div class="p-2 bd-highlight">
+                              <div class="card text-white bg-success mb-3" style="max-width: 18rem;">
+                                   
+                                        <div class="card-header text-center">Winning Bid</div>
+                                        <div class="card-body">
+                                        <h5 class="card-title text-center display-6"><strong>{{ closing_bid_value }}</strong></h5>
+                                        </div>
+                              </div>
+                         </div>
+                         <div class="p-2 bd-highlight">
+                              <div class="card text-white bg-success mb-3" style="max-width: 36rem;">
+                                   <div class="card-header text-center">Bid Winner</div>
+                                   <div class="card-body">
+                                   <h5 class="card-title text-center">{{ winning_bid.bidder }}</h5>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+               <div class="p-2 bd-highlight">
+                    <div class="d-flex flex-column bd-highlight mb-3">
+                         <div class="p-2 bd-highlight">
+                              {% if messages %}
+                                   <div class="messages">
+                                   {% for message in messages %}
+                                        <div class="alert alert-success" role="alert" {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </div>
+                                   {% endfor %}
+                                   </div>
+                              {% endif %}
+                         </div>
+                         <div class="p-2 bd-highlight">
+                              {% if not bid_dataset %}
+                                   No bids yet... <a class="btn btn-primary btn-sm" href="{%url 'place_bid' listing.pk %}">Place Bid</a>
+                              {% else %}
+                                   <h2>Total {{ total_bids }} bids</h2>
+                                   <table class="table">
+                                        <thead>
+                                             <tr>
+                                             <th scope="col">Bidder</th>
+                                             <th scope="col">Bid Amount</th>
+                                             <th scope="col">Comments</th>
+                                             <th scope="col">Time Posted</th>
+                                             </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for entry in bid_dataset %}
+                                             <tr>
+                                                  <td>{{ entry.bidder }}</td>
+                                                  <td>$ {{ entry.amount }}</td>
+                                                  <td>{{ entry.message }}</td>
+                                                  <td>{{ entry.time_added }}</td>
+                                             </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                   </table>
+                              {% endif %}
+                    </div>
+                    <div class="p-2 bd-highlight">
+                         <hr>
+                         <p>back to <a class="btn btn-secondary btn-sm" href="{% url 'index' %}">Home</a></p>
+                    </div>
+               {% else %}
+                    <div class="p-2 bd-highlight">
+                         <div class="alert alert-secondary" role="alert">
+                              <h5>Bidding Closed</h5>
+                              <br/>
+                              <p>Auction on this item is closed.<br/>
+                                   This item is not available for bidding.</p>
+                              <br/>
+                              <p>Please go back to <a class="btn btn-secondary btn-sm" href="{% url 'index' %}">Home</a> to check active listings.</p>
+                         </div>
+                    </div>
+               {% endif %}
+          {% else %}
+          <div class="p-2 bd-highlight">
+               <br/>
+               <br/>
+               <a class="btn btn-dark btn-sm" href="{% url 'login' %}">Login</a> for more features like Add to Watchlist or Place Bid
+               <br/>
+               <br/>
+               <hr>
+               <br/>
+               <br/>
+               <p>back to <a class="btn btn-secondary btn-sm" href="{% url 'index' %}">Home</a></p>
+          </div>
+          {% endif %}
+     </div>
+</div>
+</div>
+<hr>
+{% endblock %}

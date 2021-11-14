@@ -1,0 +1,14 @@
+{% extends 'auctions/layout.html' %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+    <h1>Categories</h1>
+        <ul>
+            {% for item in cat_list %}
+                <li>
+                    <a class="dropdown-item" href="{% url 'category' item|slugify %}">{{ item }}</a>
+                </li>
+            {% endfor %}    
+        </ul>
+        <br/>
+    Go back to <a class="btn btn-dark" href="{% url 'index' %}">Home</a>
+{% endblock %}
